@@ -90,6 +90,20 @@ def repo_issue_timeline(owner: str, repo: str, number: int):
     else:
         return 'heh'
 
+@app.get("/{owner}/{repo}/pulls")
+def repo_issue_timeline(owner: str, repo: str):
+    response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/pulls?state=all&per_page=100", headers={"accept" : "application/vnd.github+json"})
+    data = response.json()
+    to_ret = []
+    page = 2
+    while response.status_code == 200 and data != []:
+        for pull in data:
+            to_ret.append((pull['number'], pull['created_at'], pull['closed_at']))
+        response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/pulls?state=all&per_page=100&page={page}", headers={"accept" : "application/vnd.github+json"})
+        data = response.json()
+        page += 1
+    return to_ret 
+
 @app.post("/analyze")
 def repo_overview(owner: str, repo: str):
     return f"Get repo {repo} from {owner}"
