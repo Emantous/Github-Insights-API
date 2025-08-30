@@ -1,5 +1,3 @@
-from enum import Enum
-from pydantic import BaseModel
 from fastapi import FastAPI
 import os
 import requests
@@ -29,9 +27,9 @@ def repo_contributors(owner: str, repo: str):
     response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/contributors", headers={"accept" : "application/vnd.github+json"})
     data = response.json()
     if response.status_code == 200:
-        transofrmed_contributors = []
+        transofrmed_contributors = {}
         for member in data:
-            transofrmed_contributors.append((member['login'], member['contributions']))
+            transofrmed_contributors[member['login']] = member['contributions']
         return transofrmed_contributors
     else:
         return 'heh'
@@ -46,7 +44,6 @@ def repo_overview(owner: str, repo: str):
         repo_info["watchers"] = data["watchers_count"]
         repo_info["main_language"] = data["language"]
         repo_info["forks"] = data["forks_count"]
-        repo_info["open issues"] = data["open_issues_count"]
         return repo_info
     else:
         return 'heh'
