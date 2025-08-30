@@ -4,18 +4,6 @@ from fastapi import FastAPI
 import os
 import requests
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
-class ModelName(str, Enum):
-    alexnet = "alexnet"
-    resnet = "resnet"
-    lenet = "lenet"
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
-
 app = FastAPI(title="GitHub Insights API")
 
 
@@ -63,33 +51,6 @@ def repo_overview(owner: str, repo: str):
     else:
         return 'heh'
 
-@app.get("/{owner}/{repo}/stars")
-def repo_stars(owner: str, repo: str):
-    response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/stargazers", headers={"accept" : "application/vnd.github+json"})
-    data = response.json()
-    if response.status_code == 200:
-        return data
-    else:
-        return 'heh'
-
-@app.get("/{owner}/{repo}/issues")
-def repo_issues(owner: str, repo: str):
-    response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/issues", headers={"accept" : "application/vnd.github+json"})
-    data = response.json()
-    if response.status_code == 200:
-        return data
-    else:
-        return 'heh'
-
-@app.get("/{owner}/{repo}/issues/{number}")
-def repo_issue_timeline(owner: str, repo: str, number: int):
-    response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/issues/{number}/timeline", headers={"accept" : "application/vnd.github+json"})
-    data = response.json()
-    if response.status_code == 200:
-        return data
-    else:
-        return 'heh'
-
 @app.get("/{owner}/{repo}/pulls")
 def repo_issue_timeline(owner: str, repo: str):
     response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/pulls?state=all&per_page=100", headers={"accept" : "application/vnd.github+json"})
@@ -103,11 +64,3 @@ def repo_issue_timeline(owner: str, repo: str):
         data = response.json()
         page += 1
     return to_ret 
-
-@app.post("/analyze")
-def repo_overview(owner: str, repo: str):
-    return f"Get repo {repo} from {owner}"
-
-@app.delete("/{owner}/{repo}")
-def repo_overview(owner: str, repo: str):
-    return f"Get repo {repo} from {owner}"
